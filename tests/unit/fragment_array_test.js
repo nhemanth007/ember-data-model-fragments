@@ -282,4 +282,31 @@ module('unit - `MF.fragmentArray`', function(hooks) {
       });
     });
   });
+
+  test('changes to fragment array are indicated in the owner record\'s `changedAttributes`', function(assert) {
+    run(() => {
+      store.push({
+        data: {
+          type: 'person',
+          id: 1,
+          attributes: {
+            names: [
+              {
+                first: 'Catelyn',
+                last: 'Stark'
+              }
+            ]
+          }
+        }
+      });
+
+      return store.find('person', 1).then(person => {
+        let fragments = person.get('names');
+        let fragment = fragments.get('firstObject');
+
+        fragment.set('first', 'Cat');
+        assert.equal(JSON.stringify(person.changedAttributes().names), '', 'changed fragment array values are indicated in the diff object');
+      });
+    });
+  });
 });
